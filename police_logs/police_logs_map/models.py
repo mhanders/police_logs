@@ -25,6 +25,7 @@ def deserialize_to_police_log(data):
 		date_from__lte=datetime_reported
 		).filter(date_to__gte=datetime_reported)
 	assert(report_set.count() < 1)
+	
 	if report_set.count() == 0:
 		assert(PoliceLogReport.order_by(
 			'date_to__gte'
