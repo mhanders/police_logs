@@ -18,5 +18,5 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^polls/', include('police_logs_map.urls'))
+    url(r'^logs/', include('police_logs_map.urls'))
 ]
