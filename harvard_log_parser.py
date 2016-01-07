@@ -6,9 +6,20 @@ class HardvardPoliceLog(object):
 		self.datetime_reported = data[0]
 		self.incident_type = data[1]
 		self.datetime_occurred = data[2]
-		self.location = data[3]
+		self.address = data[3]
 		self.disposition = data[4]
 		self.detail = data[5]
+
+	def to_json(self):
+		return {
+			'datetime_reported': self.datetime_reported,
+			'datetime_occurred': self.datetime_occurred,
+			'incident_type': self.incident_type,
+			'address': self.address,
+			'disposition': self.disposition,
+			'detail': self.detail,
+			'authority': 'HARVARD'
+		}
 
 
 def chunk(chunk_list, chunk_length):
@@ -36,4 +47,3 @@ with open('sample_2page.txt', 'r') as f:
 		lines = remove_headers(lines)
 		chunks = chunk(lines, 6)
 		police_logs = map(lambda x: HardvardPoliceLog(x), chunks)
-		ipdb.set_trace()
