@@ -15,8 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from police_logs_map.views import index, create, create_report
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^logs/', include('police_logs_map.urls'))
+    url(r'^$', index, name='map'),
+    url(r'^internal/create/', create, name='create_log'),
+    url(r'^internal/create_report/', create_report, name='create_report')
 ]
