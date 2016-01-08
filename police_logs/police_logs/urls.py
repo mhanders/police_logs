@@ -21,6 +21,5 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', index, name='map'),
     url(r'^internal/create/', create, name='create_log'),
-    url(r'^internal/create_report/', create_report, name='create_report'),
     url(r'^last_report/', last_report, name='last_report')
 ]
