@@ -11,18 +11,32 @@
   	</style>
   	<script src="https://maps.googleapis.com/maps/api/js"></script>
   	<script>
-      function addMarker(map, latlng, title) {
+      function addMarker(map, latlng, title, infowindow) {
         var marker = new google.maps.Marker({
             position: latlng,
             map: map,
             title: title
           });
+        
+        marker.addListener('click', function() {
+          infowindow.open(map, marker);
+        });
       }
 
       function addMarkers(map) {
         {% for police_log in police_logs %}
+          var infowindow_content = '<div class="info-window-content">' + 
+            '<h2>{{police_log.incident_type}}</h2>' + 
+            '<ul>' + 
+              '<li><b>Address</b>: {{police_log.address}}</li>' + 
+              '<li><b>Detail</b>: {{police_log.detail}}</li>' + 
+              '<li><b>Time Occurred</b>: {{police_log.datetime_occurred}}</li>' + 
+            '</ul></div>';
+          var infowindow = new google.maps.InfoWindow({
+            content: infowindow_content
+          });
           var latlng = new google.maps.LatLng({{police_log.lat}}, {{police_log.lng}});
-          addMarker(map, latlng, "{{police_log.incident_type");
+          addMarker(map, latlng, "{{police_log.incident_type", infowindow);
         {% endfor %}
       }
 
