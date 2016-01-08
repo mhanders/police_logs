@@ -8,4 +8,4 @@ class HarvardPoliceLogParser(LogParser):
 		super(HarvardPoliceLogParser, self).__init__(HarvardPoliceLog)
 
 if __name__ == '__main__':
-	print HarvardPoliceLogParser().get_logs_from_report('sample_2page.txt')
+	print HarvardPoliceLogParser().parse('sample_2page.txt')

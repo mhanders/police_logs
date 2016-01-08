@@ -21,7 +21,7 @@ class LogParser(object):
 		return chunks
 
 	# TODO: Cleanup this method
-	def get_logs_from_report(self, filename):
+	def parse(self, filename):
 		with open(filename, 'r') as f:
 			data = f.read()
 			pages = [page for page in data.split('\x0c') if page]
