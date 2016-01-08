@@ -12,6 +12,9 @@ class PoliceLog(models.Model):
 	detail			  = models.TextField()
 	authority		  = models.CharField(max_length=20)
 
+	class Meta:
+		unique_together = ('datetime_reported', 'datetime_occurred', 'address', 'detail')
+
 def deserialize_to_police_log(data):
 	return PoliceLog(
 		datetime_reported=parse(data['datetime_reported']),

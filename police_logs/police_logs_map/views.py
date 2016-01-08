@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.shortcuts import render
 from django.template import Template, Context, loader
 from django.views.decorators.http import require_http_methods
@@ -23,6 +24,9 @@ def last_report(request):
 @csrf_exempt
 @require_http_methods(['POST'])
 def create(request):
-	police_log = deserialize_to_police_log(request.POST)
-	police_log.save()
-	return HttpResponse(status=200)
+	try:
+		police_log = deserialize_to_police_log(request.POST)
+		police_log.save()
+		return HttpResponse(status=200)
+	except IntegrityError as error:
+		return HttpResponse(error.message, status=422)
