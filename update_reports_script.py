@@ -4,7 +4,7 @@ import ipdb
 
 parser = HarvardPoliceLogParser()
 logs = parser.parse('sample_2page.txt')
-log = logs[0]
-# print map(lambda x: x.to_json(), logs)
+logs_as_json = map(lambda x: x.to_json(), logs)
 
-print requests.post('http://localhost:8000/internal/create/', data=log.to_json()).text[:10100]
+for log_json in logs_as_json:
+	requests.post('http://localhost:8000/internal/create/', data=log_json)
