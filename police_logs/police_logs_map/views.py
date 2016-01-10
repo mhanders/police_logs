@@ -8,8 +8,6 @@ from models import PoliceLog, deserialize_to_police_log
 from dateutil.parser import parse
 import ipdb
 
-EXISTING_POLICE_LOG_REPORT_MSG = 'Error 400: PoliceLogReport with overlapping dates already exists'
-
 @require_http_methods(['GET'])
 def index(request):
 	context = Context({'police_logs': PoliceLog.objects.all()})
