@@ -1,6 +1,6 @@
 from django.db import IntegrityError
 from django.shortcuts import render
-from django.template import Template, Context, loader
+from django.template import Context
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
