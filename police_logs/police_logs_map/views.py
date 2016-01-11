@@ -10,23 +10,26 @@ import ipdb
 
 EXISTING_POLICE_LOG_REPORT_MSG = 'Error 400: PoliceLogReport with overlapping dates already exists'
 
+
 @require_http_methods(['GET'])
 def index(request):
-	context = Context({'police_logs': PoliceLog.objects.all()})
-	return render(request, 'map.html', context)
+    context = Context({'police_logs': PoliceLog.objects.all()})
+    return render(request, 'map.html', context)
+
 
 @require_http_methods(['GET'])
 def last_report(request):
-	logs = PoliceLog.objects.order_by('datetime_reported')
-	assert(len(logs) > 0)
-	return HttpResponse(logs.last().datetime_reported.date())
+    logs = PoliceLog.objects.order_by('datetime_reported')
+    assert(len(logs) > 0)
+    return HttpResponse(logs.last().datetime_reported.date())
+
 
 @csrf_exempt
 @require_http_methods(['POST'])
 def create(request):
-	try:
-		police_log = deserialize_to_police_log(request.POST)
-		police_log.save()
-		return HttpResponse(status=200)
-	except IntegrityError as error:
-		return HttpResponse(error.message, status=422)
+    try:
+        police_log = deserialize_to_police_log(request.POST)
+        police_log.save()
+        return HttpResponse(status=200)
+    except IntegrityError as error:
+        return HttpResponse(error.message, status=422)
