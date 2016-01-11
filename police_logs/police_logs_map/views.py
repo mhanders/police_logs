@@ -1,15 +1,12 @@
 from django.db import IntegrityError
 from django.shortcuts import render
-from django.template import Template, Context, loader
+from django.template import Context
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from models import PoliceLog, deserialize_to_police_log
 from dateutil.parser import parse
 import ipdb
-
-EXISTING_POLICE_LOG_REPORT_MSG = 'Error 400: PoliceLogReport with overlapping dates already exists'
-
 
 @require_http_methods(['GET'])
 def index(request):
