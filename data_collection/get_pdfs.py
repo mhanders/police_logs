@@ -1,31 +1,52 @@
-from urllib2 import urlopen
-from bs4 import BeautifulSoup
+import sys
+import logging
+import numpy as np
+import requests
 from dateutil.parser import parse
+from datetime import datetime
 
 API_URL = 'http://localhost:8000/last_report'
-HUPD_LOGS_LINK = 'http://www.hupd.harvard.edu/public-police-log'
+HUPD_PDF_LINK = "http://www.hupd.harvard.edu/files/hupd/files/%s.pdf"
 LOG_PDF_NAME = "HUPD_LOG_%s.pdf"
 
 
-def save_pdf_from_link(url, date):
-    filename = LOG_PDF_NAME % date.strftime("%m-%d-%Y")
-    with open('log_pdfs/%s' % filename, 'wb') as f:
-        for data in urlopen(url).read():
-            f.write(data)
+class HarvardPDFDownloader(object):
 
-last_report_resp = urlopen(API_URL)
-assert last_report_resp
-last_report_date = parse(last_report_resp.read()).date()
-print "Got last date as " + str(last_report_date)
+    def __init__(self):
+        self.logger = self._get_logger()
 
-hupd_logs_site = urlopen(HUPD_LOGS_LINK)
-bsobj = BeautifulSoup(hupd_logs_site, 'html.parser')
+    @staticmethod
+    def _get_logger():
+        logger = logging.getLogger('pdf_script_logger')
+        sh = logging.StreamHandler(sys.stdout)
+        sh.setLevel(logging.INFO)
+        logger.addHandler(sh)
+        logger.setLevel(logging.INFO)
+        return logger
 
-file_divs = bsobj.find_all('div', {'class': 'file-info'})
-for file_div in file_divs:
-    report_date = parse(file_div.find('a', {'class': 'entity-link'}).get_text()).date()
-    if report_date > last_report_date:
-        download_link = file_div.find('a', {'class': 'download-link'}).get('href')
-        print "Attempting to download file from %s" % download_link
-        save_pdf_from_link(download_link, report_date)
-        print "Successfully downloaded!!"
+    def _save_pdf_from_link(self, url, date):
+        filename = LOG_PDF_NAME % date.strftime("%m-%d-%Y")
+        response = requests.get(url)
+        if response.status_code == 200:
+            with open('log_pdfs/%s' % filename, 'wb') as f:
+                for data in response.iter_content():
+                    f.write(data)
+                self.logger.info("PDF written successfully")
+        else:
+            self.logger.info("404 on log with date %s" % date.strftime("%m-%d-%Y"))
+
+    def run(self):
+        last_report_resp = requests.get(API_URL).text
+        assert last_report_resp
+        last_report_date = parse(last_report_resp).date()
+        self.logger.info("Got last date as " + str(last_report_date))
+
+        date_range = np.arange(last_report_date, np.datetime64('today')).astype(datetime)
+        pdf_links = map(lambda dateobj: HUPD_PDF_LINK % dateobj.strftime("%m%d%y"), date_range)
+
+        for link, date in zip(pdf_links, date_range):
+            self.logger.info("Attempting to download log from %s" % date.strftime("%m-%d-%Y"))
+            self._save_pdf_from_link(link, date)
+
+if __name__ == '__main__':
+    HarvardPDFDownloader().run()
