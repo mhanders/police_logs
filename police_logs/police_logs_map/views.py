@@ -5,8 +5,6 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from models import PoliceLog, deserialize_to_police_log
-from dateutil.parser import parse
-import ipdb
 
 @require_http_methods(['GET'])
 def index(request):
