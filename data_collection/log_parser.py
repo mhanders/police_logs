@@ -51,7 +51,6 @@ class LogParser(object):
         chunks = []
         while len(data_list) > 0:
             chunk, data_list= self.pop_chunk(data_list)
-            print chunk
             chunks.append(chunk)
         return chunks
 
