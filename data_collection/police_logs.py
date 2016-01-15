@@ -1,24 +1,23 @@
 from dateutil.parser import parse
 import re
 import geocoder
-import ipdb
-
-date_reg = '(?:0|1)[0-2]/[0-3][0-9]/[0-3][0-9]'
-time_reg = '(?:(?:1?[0-2])|[0-9]):[0-9]{2}\s(?:A|P)M'
-datetime_reg = re.compile(date_reg + '\s*-?\s*' + time_reg)
-
-
-def parse_datetime_occurred(datetime_str):
-    datetimes = datetime_reg.findall(datetime_str)
-    assert(len(datetimes) > 0)
-    return parse(datetimes[0])
-
-
-def latlng(address):
-    return geocoder.google(address).latlng
 
 
 class PoliceLog(object):
+
+    date_reg = r'(?:0|1)[0-2]/[0-3][0-9]/[0-3][0-9]'
+    time_reg = r'(?:(?:1?[0-2])|[0-9]):[0-9]{2}\s(?:A|P)M'
+    datetime_reg = re.compile(date_reg + '\s*-?\s*' + time_reg)
+
+    @staticmethod
+    def parse_datetime_occurred(datetime_str):
+        datetimes = PoliceLog.datetime_reg.findall(datetime_str)
+        assert(len(datetimes) > 0)
+        return parse(datetimes[0])
+
+    @staticmethod
+    def latlng(address):
+        return geocoder.google(address).latlng
 
     def to_json(self):
         raise NotImplementedError()
@@ -26,12 +25,14 @@ class PoliceLog(object):
 
 class HarvardPoliceLog(PoliceLog):
 
+    dispositions = ['CLOSED', 'OPEN', 'ARREST']
+
     def __init__(self, data):
         self.datetime_reported = parse(data[0])
         self.incident_type = data[1]
-        self.datetime_occurred = parse_datetime_occurred(data[2])
+        self.datetime_occurred = PoliceLog.parse_datetime_occurred(data[2])
         self.address = data[3]
-        self.latlng = latlng(self.address)
+        self.latlng = PoliceLog.latlng(self.address)
         self.disposition = data[4]
         self.detail = data[5]
 
