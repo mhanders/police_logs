@@ -1,4 +1,3 @@
-import ipdb
 from police_logs import PoliceLog
 
 
@@ -11,7 +10,7 @@ class LogParser(object):
     @staticmethod
     def remove_headers(lines):
         line = None
-        while not line or line != 'Disposition':
+        while len(lines) > 0 and (not line or line != 'Disposition'):
             line = lines.pop(0).strip()
         return lines
 
@@ -21,6 +20,9 @@ class LogParser(object):
 
         :return: decapitated data_list and the chunk
         """
+
+        copy = data_list[:]
+
         def pop_list_and_append(list_to_append, the_list):
             next_line = the_list.pop(0)
             list_to_append.append(next_line)
@@ -67,6 +69,13 @@ class LogParser(object):
         for page in pages:
             lines = [line for line in page.split('\n\n') if line]
             lines = LogParser.remove_headers(lines)
+            if len(lines) == 0:  # It is possible that *only* headers exist on the page, in which case just break
+                break
             chunks = self._chunk(lines)
-            police_logs += map(lambda x: self.log_class(x), chunks)
+            for chunk in chunks:
+                try:
+                    police_log_obj = self.log_class(chunk)
+                    police_logs.append(police_log_obj)
+                except Exception as e:
+                    print e
         return police_logs
