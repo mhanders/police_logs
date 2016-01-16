@@ -60,3 +60,6 @@ target/
 
 # PyCharm
 .idea
+
+# Data
+temp_data/
