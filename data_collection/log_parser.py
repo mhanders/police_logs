@@ -79,3 +79,9 @@ class LogParser(object):
                 except Exception as e:
                     print e
         return police_logs
+
+
+class HarvardPoliceLogParser(LogParser):
+
+    def __init__(self):
+        super(HarvardPoliceLogParser, self).__init__(HarvardPoliceLog)

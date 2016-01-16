@@ -63,3 +63,5 @@ target/
 
 # Data
 temp_data/
+
+.DS_Store
