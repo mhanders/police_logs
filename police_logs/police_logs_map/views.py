@@ -7,10 +7,11 @@ from django.http import HttpResponse
 from models import PoliceLog, deserialize_to_police_log
 import datetime
 
+
 @require_http_methods(['GET'])
 def index(request):
-    context = Context({'police_logs': PoliceLog.objects.all()})
-    return render(request, 'map.html', context)
+    police_logs = PoliceLog.objects.exclude(lat__isnull=True, lng__isnull=True)
+    return render(request, 'map.html', {'police_logs': police_logs})
 
 
 @require_http_methods(['GET'])
