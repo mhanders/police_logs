@@ -5,6 +5,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from models import PoliceLog, deserialize_to_police_log
+import datetime
 
 @require_http_methods(['GET'])
 def index(request):
@@ -15,7 +16,8 @@ def index(request):
 @require_http_methods(['GET'])
 def last_report(request):
     logs = PoliceLog.objects.order_by('datetime_reported')
-    assert(len(logs) > 0)
+    if len(logs) == 0:
+        return HttpResponse(datetime.datetime(2015, 11, 18).date())
     return HttpResponse(logs.last().datetime_reported.date())
 
 
