@@ -1,11 +1,16 @@
 from dateutil.parser import parse
 import re
 import geocoder
+import time
+
+MAX_GEOCODE_RETRIES = 2
+GEOCODE_NO_RESULTS_STATUS = 'ZERO_RESULTS'
+DEFAULT_GEOCODE_RETURN = [None, None]
 
 
 class PoliceLog(object):
 
-    date_reg = r'(?:0|1)[0-2]/[0-3][0-9]/[0-3][0-9]'
+    date_reg = r'(?:0|1)[0-2]/[0-3]?[0-9]/[0-3][0-9]'
     time_reg = r'(?:(?:1?[0-2])|[0-9]):[0-9]{2}\s(?:A|P)M'
     datetime_reg = re.compile(date_reg + '\s*-?\s*' + time_reg)
 
@@ -16,8 +21,25 @@ class PoliceLog(object):
         return parse(datetimes[0])
 
     @staticmethod
-    def latlng(address):
-        return geocoder.google(address).latlng
+    def latlng(address, tries=0):
+        print (address, tries)
+        if tries == MAX_GEOCODE_RETRIES:
+            return DEFAULT_GEOCODE_RETURN
+        result = geocoder.google(address)
+        if result.status == GEOCODE_NO_RESULTS_STATUS:
+            split_address = address.split(' ')
+
+            # Really, an address needs more than 3 words
+            # might even want to move this logic higher up the chain.. see what real plots look like first
+            if len(split_address) > 3:
+                return PoliceLog.latlng(' '.join(split_address[1:]))
+            return DEFAULT_GEOCODE_RETURN
+
+        if result.status_code != 200:
+            time.sleep(3)
+            return PoliceLog.latlng(address, tries=tries+1)
+
+        return result.latlng
 
     def to_json(self):
         raise NotImplementedError()
@@ -41,7 +63,7 @@ class HarvardPoliceLog(PoliceLog):
             'datetime_reported': self.datetime_reported.isoformat(),
             'datetime_occurred': self.datetime_occurred.isoformat(),
             'incident_type': self.incident_type,
-            'address': self.address,
+            'address': self.address.replace('\n', ','),
             'lat': self.latlng[0],
             'lng': self.latlng[1],
             'disposition': self.disposition,
