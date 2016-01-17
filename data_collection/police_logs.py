@@ -5,6 +5,7 @@ import time
 
 MAX_GEOCODE_RETRIES = 2
 GEOCODE_NO_RESULTS_STATUS = 'ZERO_RESULTS'
+GEOCODE_TOO_MANY_QUERIES_STATUS = 'OVER_QUERY_LIMIT'
 DEFAULT_GEOCODE_RETURN = [None, None]
 
 
@@ -22,7 +23,6 @@ class PoliceLog(object):
 
     @staticmethod
     def latlng(address, tries=0):
-        print (address, tries)
         if tries == MAX_GEOCODE_RETRIES:
             return DEFAULT_GEOCODE_RETURN
         result = geocoder.google(address)
@@ -35,7 +35,7 @@ class PoliceLog(object):
                 return PoliceLog.latlng(' '.join(split_address[1:]))
             return DEFAULT_GEOCODE_RETURN
 
-        if result.status_code != 200:
+        if result.status_code != 200 or result.status == GEOCODE_TOO_MANY_QUERIES_STATUS:
             time.sleep(3)
             return PoliceLog.latlng(address, tries=tries+1)
 

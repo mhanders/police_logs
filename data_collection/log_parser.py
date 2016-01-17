@@ -1,4 +1,4 @@
-from police_logs import PoliceLog
+from police_logs import PoliceLog, HarvardPoliceLog
 
 
 class LogParser(object):
